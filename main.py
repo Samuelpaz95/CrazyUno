@@ -1,8 +1,9 @@
+from flask import Flask
+from flask_socketio import SocketIO
 
-from uno import *
+app = Flask(__name__)
 
-print('Uno en Py.')
-uno = Uno()
+socketio = SocketIO(app)
 
-while not uno.game_over():
-	uno.ronda()
+if __name__ == '__main__':
+    socketio.run(app)
