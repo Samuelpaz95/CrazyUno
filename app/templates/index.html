@@ -11,14 +11,48 @@
 <body>
   <h1>Hello world</h1>
 
+  <form id="message" method="post">
+    <input type="text" id="message-input" placeholder="Escribe tu mensaje aquí">
+    <input type="text" id="message-code" placeholder="Ingresa tu codigo de sala">
+    <button type="submit">Enviar</button>
+  </form>
+
+  <ul id="message-list"></ul>
+
   <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"
     integrity="sha512-q/dWJ3kcmjBLU4Qc47E4A9kTB4m3wuTY7vkFJDTZKjTs8jhyGQnaUrxa0Ytd0ssMZhbNua9hE+E7Qv1j+DyZwA=="
     crossorigin="anonymous"></script>
+
   <script type="text/javascript" charset="utf-8">
-    var socket = io();
-    socket.on('connect', function () {
-      socket.emit('new event', { data: 'I\'m connected!' });
+
+    const socket = io('http://localhost:5000/');
+    const form = document.getElementById('message');
+    const input = document.getElementById('message-input');
+    const inputCode = document.getElementById('message-code')
+
+    let currentRoom = ''
+
+    form.addEventListener('submit', function (event) {
+
+      if (!currentRoom && currentRoom != inputCode.value) {
+        console.log('emitido')
+        socket.emit('join_room', { code: inputCode.value });
+      }
+
+      event.preventDefault();
+      var message = input.value;
+      socket.emit('send_message', { message: message, code: inputCode.value });
+      input.value = '';
     });
+
+    var list = document.getElementById('message-list');
+
+    socket.on('new_message', function (data) {
+      var li = document.createElement('li');
+      li.innerText = data.message;
+      list.appendChild(li);
+    });
+
   </script>
 </body>
 
